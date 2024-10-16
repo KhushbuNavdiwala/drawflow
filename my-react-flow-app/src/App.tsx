@@ -1,17 +1,10 @@
 import { useCallback, useState } from 'react';
 
-import { ReactFlow, Controls, Background, applyNodeChanges, applyEdgeChanges } from '@xyflow/react'
+import { ReactFlow, Controls, Background, applyNodeChanges, applyEdgeChanges, addEdge } from '@xyflow/react'
 import '@xyflow/react/dist/style.css';
 
-const initialEdges = [
-    {
-      id:'1-2',
-      source:'1',
-      target:'2',
-      label:'How is going?',
-      type:'step',
-    }
-];
+const initialEdges = [];
+
 const initialNodes =[
 
   {
@@ -26,7 +19,13 @@ const initialNodes =[
     id:'2', 
     position:{x:100, y:100},
     data:{label:'Node:2'},
+  },
+  {
+    id:'3',
+    position:{x:80,y:12},
+    data:{label:'Node:3'},
   }
+
 ];
 
 
@@ -52,6 +51,22 @@ function Flow() {
     (changes)=> setEdges((eds)=> applyEdgeChanges(changes,eds)),[]
   );
 
+  const onConnect = useCallback(
+    (params) => {
+      // Logging the target and source nodes
+      console.log(`Source: ${params.source}, Target: ${params.target}`);
+    // Check the type of connection
+      if (params.type === 'target') {
+        console.log('The connection is a target type.');
+        console.log('Source:', params.source);
+        console.log('Target:', params.target);
+      }
+    
+   setEdges((eds) => addEdge(params,eds));
+  },
+  [] // Empty dependency array, meaning this function will not be recreated on re-renders
+);
+
   return (
 
     <div style={{ width: '100%', height: '100%' }}>
@@ -60,6 +75,7 @@ function Flow() {
       onNodesChange={onNodesChange}
       edges={edges}
       onEdgesChange={onEdgesChange}
+      onConnect={onConnect}
       fitView>
       <Background/>
       <Controls/>
